@@ -12,7 +12,7 @@ services:
       - collectionName=User
       - vaultConnectionString=https://vaulthost:8201
     networks:
-      - vault_auctionnetwork
+      - go_infrastructure_auctionnetwork
     restart: unless-stopped
 
   authservice:
@@ -24,10 +24,10 @@ services:
       - vaultConnectionString=https://vaulthost:8201
       - userservicehost=http://userservice:8080
     networks:
-      - vault_auctionnetwork
+      - go_infrastructure_auctionnetwork
     restart: unless-stopped
 
 networks:
-  vault_auctionnetwork:
+  go_infrastructure_auctionnetwork:
     driver: bridge
     external: true
