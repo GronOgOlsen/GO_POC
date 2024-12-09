@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   userservice:
-    image: rasmussig/user-service:1.0.0
+    image: rasmussig/user-services:1.0.0
     container_name: userservice
     ports:
       - "80:8080"
@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
 
   authservice:
-    image: rasmussig/authservice:1.0.0
+    image: rasmussig/auth-service:1.0.0
     container_name: authservice
     ports:
       - "81:8080"
