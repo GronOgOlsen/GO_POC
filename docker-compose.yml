@@ -14,6 +14,8 @@ services:
     networks:
       - go_infrastructure_auctionnetwork
     restart: unless-stopped
+    pull_policy: always
+
 
   authservice:
     image: rasmussig/auth-service:1.0.0
@@ -26,6 +28,8 @@ services:
     networks:
       - go_infrastructure_auctionnetwork
     restart: unless-stopped
+    pull_policy: always
+
 
 networks:
   go_infrastructure_auctionnetwork:
