@@ -30,6 +30,21 @@ services:
     restart: unless-stopped
     pull_policy: always
 
+  catalogservice:
+    image: rasmussig/catalog-service:1.0.1
+    container_name: catalogservice
+    ports:
+      - "82:8080"
+    environment:
+      - MongoConnectionString=mongodb://admin:1234@mongodb:27017
+      - DatabaseName=4SemProj
+      - collectionName=Catalog
+      - vaultConnectionString=https://vaulthost:8201
+    networks:
+      - go_infrastructure_auctionnetwork
+    restart: unless-stopped
+    pull_policy: always
+
 
 networks:
   go_infrastructure_auctionnetwork:
