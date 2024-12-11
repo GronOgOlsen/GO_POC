@@ -53,6 +53,7 @@ services:
       - collectionName=Auction
       - QueueHostName=rabbitmq
       - vaultConnectionString=https://vaulthost:8201
+      - catalogservicehost=http://catalogservice:8080
     networks:
       - go_infrastructure_auctionnetwork
     restart: unless-stopped
