@@ -1,112 +1,135 @@
-# GO_POC - Microservices Demo
+# GO_POC: Microservices Setup med NGINX Load Balancer
 
-Dette repository indeholder en Proof of Concept (POC) for en microservice-arkitektur. Projektet demonstrerer brugen af flere microservices, en NGINX-load balancer og integration med eksterne services som RabbitMQ og Vault.
+Dette repository indeholder implementeringen af et microservices-baseret system til GO_POC-projektet. Systemet består af flere services som authentication, user management, catalog, auction og bidding. **NGINX** er konfigureret som en load balancer til at dirigere trafik til de korrekte microservices.
 
-## **Indhold**
+## Funktioner
 
-- [Introduktion](#introduktion)
-- [Arkitektur](#arkitektur)
-- [Komponenter](#komponenter)
-- [Installation](#installation)
-- [Sådan bruges projektet](#sådan-bruges-projektet)
-- [Testing](#testing)
-- [Teknologier](#teknologier)
-- [Forfattere](#forfattere)
-
----
-
-## **Introduktion**
-
-Dette projekt implementerer en POC for en digital auktionsplatform, som består af følgende microservices:
-
-- **User Service**: Håndtering af brugerdata.
-- **Auth Service**: Godkendelse og token-håndtering (JWT).
-- **Catalog Service**: Håndtering af kataloger med auktionsgenstande.
-- **Auction Service**: Håndtering af auktioner og deres data.
-- **Bidding Service**: Håndtering af budgivning på auktioner.
+- **Microservices**:
+  - `authservice`: Håndterer autentificering.
+  - `userservice`: Administrerer brugerdata.
+  - `catalogservice`: Administrerer produktkataloget.
+  - `auctionservice`: Håndterer auktioner.
+  - `biddingservice`: Håndterer bud på auktioner.
+- **NGINX Load Balancer**: Dirigerer HTTP-forespørgsler baseret på URL-stier til de korrekte backend-services.
+- **Docker Compose**: Brugt til at starte alle services og NGINX som en samlet løsning.
 
 ---
 
-## **Arkitektur**
+## Filstruktur
 
-![Arkitekturdiagram](link_til_dit_diagram.png)
+- **`nginx/nginx.conf`**:
+  Indeholder NGINX-konfigurationen til at rute forespørgsler til de relevante backend-services.
 
-Systemet bruger en NGINX-load balancer som reverse proxy til at dirigere API-kald til de relevante microservices.
-
----
-
-## **Komponenter**
-
-- **NGINX**: Load balancer og reverse proxy.
-- **RabbitMQ**: Messaging mellem microservices.
-- **Vault**: Håndtering af secrets og miljøvariabler.
-- **MongoDB**: Database til opbevaring af data for microservices.
+- **`docker-compose.yml`**:
+  Definerer alle microservices, NGINX, samt netværkskonfiguration.
 
 ---
 
-## **Installation**
+## Hvordan det virker
 
-### **Forudsætninger**
-- Docker og Docker Compose installeret.
+### NGINX Konfiguration
+NGINX fungerer som en load balancer og lytter på port `4000`. Den ruter forespørgsler til de relevante backend-services baseret på URL-stien:
+- `/api/auth/` → `authservice`
+- `/api/user/` → `userservice`
+- `/api/catalog/` → `catalogservice`
+- `/api/auction/` → `auctionservice`
+- `/api/bidding/` → `biddingservice`
 
-### **Start projektet**
-1. Klon dette repository:
+Eksempel fra `nginx.conf`:
+```nginx
+location /api/auth/ {
+    proxy_pass http://auth_backend;
+}
+```
+
+### Docker Compose
+`docker-compose.yml` filen bruges til:
+- At starte alle microservices og NGINX.
+- Sikre, at NGINX venter på, at alle services er klar.
+- Forbinde alle services til samme Docker-netværk (`go_infrastructure_auctionnetwork`).
+
+---
+
+## Opsætningsvejledning
+
+1. **Klon repository**:
    ```bash
-   git clone https://github.com/dit-brugernavn/GO_POC.git
-   cd GO_POC
+   git clone https://github.com/dit-repo/go_poc.git
+   cd go_poc
    ```
 
-2. Start services:
+2. **Start alle services med Docker Compose**:
    ```bash
    docker-compose up -d
    ```
 
-3. Tjek status for services:
+3. **Verificer kørende containere**:
    ```bash
    docker ps
    ```
+   Sørg for, at alle services, inkl. NGINX, kører.
 
 ---
 
-## **Sådan bruges projektet**
+## Test af services
 
-Microservices er tilgængelige gennem NGINX ved følgende endpoints:
-
-- **User Service**: `http://localhost:4000/api/user`
-- **Auth Service**: `http://localhost:4000/api/auth`
-- **Catalog Service**: `http://localhost:4000/api/catalog`
-- **Auction Service**: `http://localhost:4000/api/auction`
-- **Bidding Service**: `http://localhost:4000/api/bidding`
-
-### Eksempel
-For at teste User Service:
+### Eksempel: Test `authservice`
+For at teste `authservice` login-endpointet, kan du bruge denne `curl`-kommando:
 ```bash
-curl http://localhost:4000/api/user
+curl http://localhost:4000/api/auth/loginuser \
+   -H "Content-Type: application/json" \
+   -d '{"username": "testadmin", "password": "admin123"}'
 ```
 
+Forventet svar:
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5..."
+}
+```
+
+### Test af andre services
+Du kan teste de andre endpoints som følger:
+- **User Service**:
+  ```bash
+  curl http://localhost:4000/api/user/
+  ```
+- **Catalog Service**:
+  ```bash
+  curl http://localhost:4000/api/catalog/
+  ```
+- **Auction Service**:
+  ```bash
+  curl http://localhost:4000/api/auction/
+  ```
+- **Bidding Service**:
+  ```bash
+  curl http://localhost:4000/api/bidding/
+  ```
+
 ---
 
-## **Testing**
+## Fejlfinding
 
-Du kan teste endpoints via:
-- **Postman**: Importér din Postman-kollektion og send requests.
-- **curl**: Brug kommandolinjen til at sende HTTP-requests.
-
----
-
-## **Teknologier**
-
-Projektet bruger følgende teknologier:
-- **Docker & Docker Compose**: Containerization.
-- **NGINX**: Load balancer og reverse proxy.
-- **MongoDB**: Database.
-- **RabbitMQ**: Messaging.
-- **Vault**: Håndtering af secrets.
-- **C# .NET**: Udvikling af microservices.
+- **NGINX-konfiguration**: Sørg for, at `nginx/nginx.conf` er korrekt monteret i containeren.
+- **Docker-netværk**: Sørg for, at netværket `go_infrastructure_auctionnetwork` eksisterer, og alle services er forbundet til det.
+  ```bash
+  docker network ls
+  ```
+- **Logs**: Tjek logs for fejl:
+  ```bash
+  docker logs <container_name>
+  ```
 
 ---
 
-## **Forfattere**
+## Mulige forbedringer
+- Tilføj health checks til services.
+- Implementer HTTPS i NGINX.
+---
 
-- [Dit Navn](link_til_din_github_profil)
-- Andre relevante personer eller grupper.
+## Bidragydere
+- **Dit navn**
+- **Dit team**
+
+---
