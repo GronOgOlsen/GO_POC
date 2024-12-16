@@ -1,10 +1,7 @@
 services:
   userservice:
     image: rasmussig/user-services:1.0.0
-    container_name: userservice
     platform: linux/amd64
-    ports:
-      - "80:8080"
     environment:
       - DatabaseName=4SemProj
       - collectionName=User
@@ -16,10 +13,7 @@ services:
 
   authservice:
     image: rasmussig/auth-service:1.0.0
-    container_name: authservice
     platform: linux/amd64
-    ports:
-      - "81:8080"
     environment:
       - vaultConnectionString=https://vaulthost:8201
       - userservicehost=http://userservice:8080
@@ -30,10 +24,7 @@ services:
 
   catalogservice:
     image: rasmussig/catalog-service:1.0.1
-    container_name: catalogservice     
     platform: linux/amd64
-    ports:
-      - "82:8080"
     environment:
       - DatabaseName=4SemProj
       - collectionName=Catalog
@@ -45,10 +36,7 @@ services:
 
   auctionservice:
     image: rasmussig/auction-service-image:1.0.1
-    container_name: auctionservice
     platform: linux/amd64
-    ports:
-      - "83:8080"
     environment:
       - DatabaseName=4SemProj
       - collectionName=Auction
@@ -62,10 +50,7 @@ services:
 
   biddingservice:
     image: rasmussig/bidding-service:1.0.2
-    container_name: biddingservice
     platform: linux/amd64
-    ports:
-      - "84:8080"
     environment:
       - DatabaseName=4SemProj
       - collectionName=Bids
@@ -78,12 +63,11 @@ services:
 
   nginx:
     image: nginx:latest
-    container_name: nginx
     ports:
       - "4000:4000"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:  # Sikrer, at microservices er klar, før NGINX starter
+    depends_on:
       - userservice
       - authservice
       - catalogservice
