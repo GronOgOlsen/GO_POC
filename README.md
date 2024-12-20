@@ -58,7 +58,7 @@ location /api/auth/ {
    cd go_poc
    ```
 
-2. **Start alle services med Docker Compose**:
+2. **Start alle services med Docker Compose, husk at kør infrasturkturen først**:
    ```bash
    docker-compose up -d
    ```
@@ -68,68 +68,3 @@ location /api/auth/ {
    docker ps
    ```
    Sørg for, at alle services, inkl. NGINX, kører.
-
----
-
-## Test af services
-
-### Eksempel: Test `authservice`
-For at teste `authservice` login-endpointet, kan du bruge denne `curl`-kommando:
-```bash
-curl http://localhost:4000/api/auth/loginuser \
-   -H "Content-Type: application/json" \
-   -d '{"username": "testadmin", "password": "admin123"}'
-```
-
-Forventet svar:
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5..."
-}
-```
-
-### Test af andre services
-Du kan teste de andre endpoints som følger:
-- **User Service**:
-  ```bash
-  curl http://localhost:4000/api/user/
-  ```
-- **Catalog Service**:
-  ```bash
-  curl http://localhost:4000/api/catalog/
-  ```
-- **Auction Service**:
-  ```bash
-  curl http://localhost:4000/api/auction/
-  ```
-- **Bidding Service**:
-  ```bash
-  curl http://localhost:4000/api/bidding/
-  ```
-
----
-
-## Fejlfinding
-
-- **NGINX-konfiguration**: Sørg for, at `nginx/nginx.conf` er korrekt monteret i containeren.
-- **Docker-netværk**: Sørg for, at netværket `go_infrastructure_auctionnetwork` eksisterer, og alle services er forbundet til det.
-  ```bash
-  docker network ls
-  ```
-- **Logs**: Tjek logs for fejl:
-  ```bash
-  docker logs <container_name>
-  ```
-
----
-
-## Mulige forbedringer
-- Tilføj health checks til services.
-- Implementer HTTPS i NGINX.
----
-
-## Bidragydere
-- **Dit navn**
-- **Dit team**
-
----
